@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.abdulrehman.managee.payload.request.AddressRequest;
 import com.abdulrehman.managee.payload.request.CompanyRequest;
 import com.abdulrehman.managee.payload.response.CompanyResponse;
 import com.abdulrehman.managee.payload.response.DeleteResponse;
@@ -53,6 +54,18 @@ public class CompanyController {
 	private CompanyResponse updateCompany(@NotNull @PathVariable(name = "id") Long id,
 			@RequestBody CompanyRequest companyRequest) {
 		return companyService.updateCompany(id, companyRequest);
+	}
+
+	@PostMapping("/add/address/{id}")
+	private CompanyResponse addCompanyAddress(@NotNull @PathVariable(name = "id") Long id,
+			@RequestBody AddressRequest addressRequest) {
+		return companyService.addCompanyAddress(id, addressRequest);
+	}
+
+	@PostMapping("/update/address/{companyId}/{addressId}")
+	private CompanyResponse addCompanyAddress(@NotNull @PathVariable(name = "addressId") Long addressId,
+			@NotNull @PathVariable(name = "companyId") Long companyId, @RequestBody AddressRequest addressRequest) {
+		return companyService.updateCompanyAddress(companyId, addressId, addressRequest);
 	}
 
 	@DeleteMapping("/delete/{id}")

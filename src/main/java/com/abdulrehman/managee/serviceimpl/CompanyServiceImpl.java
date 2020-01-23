@@ -10,10 +10,12 @@ import org.springframework.stereotype.Service;
 import com.abdulrehman.managee.exception.BadRequestException;
 import com.abdulrehman.managee.model.Address;
 import com.abdulrehman.managee.model.Company;
+import com.abdulrehman.managee.payload.request.AddressRequest;
 import com.abdulrehman.managee.payload.request.CompanyRequest;
 import com.abdulrehman.managee.payload.response.CompanyResponse;
 import com.abdulrehman.managee.payload.response.DeleteResponse;
 import com.abdulrehman.managee.repository.CompanyRepository;
+import com.abdulrehman.managee.service.AddressService;
 import com.abdulrehman.managee.service.CompanyService;
 import com.abdulrehman.managee.transformer.AddressTransformer;
 import com.abdulrehman.managee.transformer.CompanyTransformer;
@@ -27,6 +29,9 @@ public class CompanyServiceImpl implements CompanyService {
 
 	@Autowired
 	private CompanyRepository companyRepository;
+
+	@Autowired
+	private AddressService addressService;
 
 	@Override
 	public String greetings() {
@@ -89,6 +94,34 @@ public class CompanyServiceImpl implements CompanyService {
 	}
 
 	@Override
+	public CompanyResponse addCompanyAddress(Long companyId, AddressRequest addressRequest) {
+		Company company = validateGetCompany(companyRepository.findById(companyId));
+
+		company.addAddress(AddressTransformer.addressFromRequest(addressRequest, new Address()));
+
+		company = companyRepository.save(company);
+
+		return CompanyTransformer.responseFromCompany(company);
+	}
+
+	@Override
+	public CompanyResponse updateCompanyAddress(Long companyId, Long addressId, AddressRequest addressRequest) {
+		Company company = validateGetCompany(companyRepository.findById(companyId));
+
+		// Get address record from database using AddressService
+		Address address = addressService.findById(addressId);
+
+		// Updated address entity as user request.
+		address = AddressTransformer.addressFromRequest(addressRequest, address);
+
+		// Merging address to the company instance
+		company.addAddress(address);
+
+		// Commit and return response
+		return commitAndAcknowledgeCompany(company);
+	}
+
+	@Override
 	public DeleteResponse deleteCompany(Long id) {
 		Company company = validateGetCompany(companyRepository.findById(id));
 		companyRepository.delete(company);
@@ -100,5 +133,11 @@ public class CompanyServiceImpl implements CompanyService {
 		optional.orElseThrow(() -> new BadRequestException("No company found."));
 
 		return optional.get();
+	}
+
+	private CompanyResponse commitAndAcknowledgeCompany(Company company) {
+		companyRepository.save(company);
+
+		return CompanyTransformer.responseFromCompany(company);
 	}
 }
