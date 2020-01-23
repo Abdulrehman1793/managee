@@ -1,18 +1,21 @@
 package com.abdulrehman.managee.serviceimpl;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.abdulrehman.managee.exception.BadRequestException;
+import com.abdulrehman.managee.model.Address;
 import com.abdulrehman.managee.model.Company;
 import com.abdulrehman.managee.payload.request.CompanyRequest;
 import com.abdulrehman.managee.payload.response.CompanyResponse;
 import com.abdulrehman.managee.payload.response.DeleteResponse;
 import com.abdulrehman.managee.repository.CompanyRepository;
 import com.abdulrehman.managee.service.CompanyService;
+import com.abdulrehman.managee.transformer.AddressTransformer;
 import com.abdulrehman.managee.transformer.CompanyTransformer;
 
 /**
@@ -64,15 +67,19 @@ public class CompanyServiceImpl implements CompanyService {
 
 		company.setCode(code);
 
+		Set<Address> addresses = AddressTransformer.addressesFromCompanyRequest(companyRequest.getAddressRequests());
+		if (addresses != null)
+			company.setAddresses(addresses);
+
 		company = companyRepository.save(company);
 
 		return CompanyTransformer.responseFromCompany(company);
 	}
 
 	@Override
-	public CompanyResponse updateCompany(CompanyRequest companyRequest) {
+	public CompanyResponse updateCompany(Long id, CompanyRequest companyRequest) {
 
-		Company company = validateGetCompany(companyRepository.findById(companyRequest.getId()));
+		Company company = validateGetCompany(companyRepository.findById(id));
 
 		company = CompanyTransformer.companyFromRequest(companyRequest, company);
 

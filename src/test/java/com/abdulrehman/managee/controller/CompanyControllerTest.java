@@ -120,13 +120,14 @@ class CompanyControllerTest {
 	@Test
 	@DisplayName("Test update company successfully")
 	void testUpdateCompany() throws Exception {
-		companyRequest.setId(ID);
 
-		when(companyService.updateCompany(ArgumentMatchers.any(CompanyRequest.class))).thenReturn(companyResponse);
+		when(companyService.updateCompany(ArgumentMatchers.any(Long.class), ArgumentMatchers.any(CompanyRequest.class)))
+				.thenReturn(companyResponse);
 
 		// response is retrieved as MvcResult
 		MvcResult mvcResult = mockMvc
-				.perform(post("/company/update").contentType(MediaType.APPLICATION_JSON).content(json(companyRequest)))
+				.perform(post("/company/update/" + ID).contentType(MediaType.APPLICATION_JSON)
+						.content(json(companyRequest)))
 				.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.displayName", is(DISPLAYNAME))).andReturn();
 

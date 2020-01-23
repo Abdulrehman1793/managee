@@ -36,7 +36,7 @@ import com.abdulrehman.managee.security.JwtAuthenticationFilter;
         jsr250Enabled = true,
         prePostEnabled = true
 )
-//@Profile(value = {"development", "production"})
+@Profile(value = {"development", "production"})
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired

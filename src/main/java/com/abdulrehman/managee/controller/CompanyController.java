@@ -49,9 +49,10 @@ public class CompanyController {
 		return companyService.createCompany(companyRequest);
 	}
 
-	@PostMapping("/update")
-	private CompanyResponse updateCompany(@RequestBody CompanyRequest companyRequest) {
-		return companyService.updateCompany(companyRequest);
+	@PostMapping("/update/{id}")
+	private CompanyResponse updateCompany(@NotNull @PathVariable(name = "id") Long id,
+			@RequestBody CompanyRequest companyRequest) {
+		return companyService.updateCompany(id, companyRequest);
 	}
 
 	@DeleteMapping("/delete/{id}")

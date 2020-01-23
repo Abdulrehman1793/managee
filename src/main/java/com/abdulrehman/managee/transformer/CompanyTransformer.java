@@ -23,6 +23,9 @@ public class CompanyTransformer {
 		companyResponse.setType(company.getType());
 		companyResponse.setCode(company.getCode());
 
+		companyResponse
+				.setAddressesResponseCustom(AddressTransformer.addressesResponseFromAddressses(company.getAddresses()));
+
 		return companyResponse;
 	}
 

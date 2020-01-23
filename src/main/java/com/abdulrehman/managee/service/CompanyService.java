@@ -20,7 +20,7 @@ public interface CompanyService {
 
 	public abstract CompanyResponse createCompany(CompanyRequest companyRequest);
 
-	public abstract CompanyResponse updateCompany(CompanyRequest companyRequest);
+	public abstract CompanyResponse updateCompany(Long id, CompanyRequest companyRequest);
 
 	public abstract DeleteResponse deleteCompany(Long id);
 
