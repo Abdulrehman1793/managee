@@ -34,11 +34,6 @@ public class CompanyServiceImpl implements CompanyService {
 	private AddressService addressService;
 
 	@Override
-	public String greetings() {
-		return "Company service";
-	}
-
-	@Override
 	public CompanyResponse findByDisplayName(String displayName) {
 		Optional<Company> optional = companyRepository.findByDisplayName(displayName);
 
@@ -116,6 +111,24 @@ public class CompanyServiceImpl implements CompanyService {
 
 		// Merging address to the company instance
 		company.addAddress(address);
+
+		// Commit and return response
+		return commitAndAcknowledgeCompany(company);
+	}
+
+	@Override
+	public CompanyResponse deleteCompanyAddress(Long companyId, Long addressId) {
+
+		// Get company record by id
+		Company company = validateGetCompany(companyRepository.findById(companyId));
+
+		// Remove address by id from Set<Address>.
+		// It will only delete mapping from Jointable(company_address_lnk) but address
+		// data will remain in table, So we need to delete from address table too.
+		company.removeAddressById(addressId);
+
+		// Remove address record from address table
+		addressService.deleteById(addressId);
 
 		// Commit and return response
 		return commitAndAcknowledgeCompany(company);

@@ -49,10 +49,18 @@ public class Company extends UserDateAudit {
 	private Set<Address> addresses;
 
 	public void addAddress(Address address) {
-		// FIXME: compare and then add address, HINT: Use comparator and compare with id.
-		// Created by Khan Abdulrehman on Jan 23, 2020 11:16:41 PM
 		if (this.addresses == null)
 			this.addresses = new HashSet<Address>();
 		this.addresses.add(address);
+	}
+
+	public void removeAddress(Address address) {
+		if (this.addresses != null && address != null)
+			this.addresses.removeIf(row -> row.getId() == address.getId());
+	}
+
+	public void removeAddressById(Long id) {
+		if (this.addresses != null && id > 0)
+			this.addresses.removeIf(row -> row.getId() == id);
 	}
 }

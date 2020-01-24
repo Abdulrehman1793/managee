@@ -1,6 +1,7 @@
 package com.abdulrehman.managee.service;
 
 import com.abdulrehman.managee.model.Address;
+import com.abdulrehman.managee.payload.response.DeleteResponse;
 
 /**
  * @author Khan Abdulrehman
@@ -8,4 +9,6 @@ import com.abdulrehman.managee.model.Address;
  */
 public interface AddressService {
 	public abstract Address findById(Long id);
+
+	public abstract DeleteResponse deleteById(Long id);
 }

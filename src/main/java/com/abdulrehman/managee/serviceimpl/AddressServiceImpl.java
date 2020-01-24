@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.abdulrehman.managee.exception.BadRequestException;
 import com.abdulrehman.managee.model.Address;
+import com.abdulrehman.managee.payload.response.DeleteResponse;
 import com.abdulrehman.managee.repository.AddressRepository;
 import com.abdulrehman.managee.service.AddressService;
 
@@ -22,10 +23,17 @@ public class AddressServiceImpl implements AddressService {
 
 	@Override
 	public Address findById(Long id) {
+		return validateGetAddress(addressRepository.findById(id));
+	}
 
-		Optional<Address> optional = addressRepository.findById(id);
+	@Override
+	public DeleteResponse deleteById(Long id) {
 
-		return validateGetAddress(optional);
+		Address address = validateGetAddress(addressRepository.findById(id));
+
+		addressRepository.delete(address);
+
+		return new DeleteResponse("Record deleted succeddfully.");
 	}
 
 	private Address validateGetAddress(Optional<Address> optional) {

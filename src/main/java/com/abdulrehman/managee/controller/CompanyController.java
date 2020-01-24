@@ -63,9 +63,15 @@ public class CompanyController {
 	}
 
 	@PostMapping("/update/address/{companyId}/{addressId}")
-	private CompanyResponse addCompanyAddress(@NotNull @PathVariable(name = "addressId") Long addressId,
+	private CompanyResponse updateCompanyAddress(@NotNull @PathVariable(name = "addressId") Long addressId,
 			@NotNull @PathVariable(name = "companyId") Long companyId, @RequestBody AddressRequest addressRequest) {
 		return companyService.updateCompanyAddress(companyId, addressId, addressRequest);
+	}
+
+	@DeleteMapping("/delete/address/{companyId}/{addressId}")
+	private CompanyResponse deleteCompanyAddress(@NotNull @PathVariable(name = "addressId") Long addressId,
+			@NotNull @PathVariable(name = "companyId") Long companyId) {
+		return companyService.deleteCompanyAddress(companyId, addressId);
 	}
 
 	@DeleteMapping("/delete/{id}")
