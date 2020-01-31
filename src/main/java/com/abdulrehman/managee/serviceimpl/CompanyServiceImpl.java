@@ -26,7 +26,8 @@ import com.abdulrehman.managee.transformer.CompanyTransformer;
  */
 @Service
 public class CompanyServiceImpl implements CompanyService {
-
+	// TODO: Properly comment on each line of code and description on method
+	// Created by Khan Abdulrehman on Jan 24, 2020 8:22:59 AM
 	@Autowired
 	private CompanyRepository companyRepository;
 

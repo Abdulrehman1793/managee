@@ -49,9 +49,11 @@ public class Company extends UserDateAudit {
 	private Set<Address> addresses;
 
 	public void addAddress(Address address) {
-		if (this.addresses == null)
-			this.addresses = new HashSet<Address>();
-		this.addresses.add(address);
+		if (address != null) {
+			if (this.addresses == null)
+				this.addresses = new HashSet<Address>();
+			this.addresses.add(address);
+		}
 	}
 
 	public void removeAddress(Address address) {
