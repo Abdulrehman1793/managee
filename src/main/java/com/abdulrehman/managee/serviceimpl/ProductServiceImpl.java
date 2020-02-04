@@ -22,7 +22,6 @@ import com.abdulrehman.managee.payload.response.DeleteResponse;
 import com.abdulrehman.managee.payload.response.ProductResponse;
 import com.abdulrehman.managee.repository.ProductRepository;
 import com.abdulrehman.managee.service.ProductService;
-import com.abdulrehman.managee.transformer.ProductDiscountTransformer;
 import com.abdulrehman.managee.transformer.ProductPriceHistoryTransformer;
 import com.abdulrehman.managee.transformer.ProductTransformer;
 import com.abdulrehman.managee.util.AppConstants;
@@ -75,8 +74,7 @@ public class ProductServiceImpl implements ProductService {
 		ProductDiscountRequest productDiscountRequest = productRequest.getProductDiscountRequest();
 		// Adding product discount.
 		if (productDiscountRequest != null)
-			product.addProductDiscount(
-					ProductDiscountTransformer.convertRequestToEntity(new ProductDiscount(), productDiscountRequest));
+			newProductDiscount(product, productDiscountRequest);
 
 		product = productRepository.save(product);
 
@@ -91,8 +89,35 @@ public class ProductServiceImpl implements ProductService {
 
 		product = ProductTransformer.convertRequestToEntityUpdate(product, productRequest);
 
-		ProductPriceHistoryRequest productPriceHistoryRequest = productRequest.getProductPriceHistoryRequest();
 		// UPDATE: product price history
+		updateProductPriceHistory(product, productRequest.getProductPriceHistoryRequest());
+
+		// UPDATE: product discount
+		updateProductDiscount(product, productRequest.getProductDiscountRequest());
+
+		product = productRepository.save(product);
+
+		return ProductTransformer.convertEntityToResponse(product);
+	}
+
+	@Override
+	public DeleteResponse deleteProduct(Long productId) {
+
+		productRepository.findById(productId).orElseThrow(() -> new BadRequestException("Invalid product."));
+
+		return new DeleteResponse("Product deleted successfully.");
+	}
+
+	private void newProductDiscount(Product product, ProductDiscountRequest productDiscountRequest) {
+		if (productDiscountRequest.getDiscount() > 100)
+			throw new BadRequestException("Discount percentage should be less than 100.");
+
+		// Create New product discount
+		product.addProductDiscount(new ProductDiscount(productDiscountRequest.getMessage(),
+				productDiscountRequest.getDiscount(), Instant.now()));
+	}
+
+	private void updateProductPriceHistory(Product product, ProductPriceHistoryRequest productPriceHistoryRequest) {
 		if (productPriceHistoryRequest != null) {
 			// Get last PPH
 			ProductPriceHistory productPriceHistory = product.getProductPriceHistory();
@@ -113,7 +138,9 @@ public class ProductServiceImpl implements ProductService {
 				productPriceHistory.setMessage(productPriceHistoryRequest.getMessage());
 			}
 		}
-		ProductDiscountRequest productDiscountRequest = productRequest.getProductDiscountRequest();
+	}
+
+	private void updateProductDiscount(Product product, ProductDiscountRequest productDiscountRequest) {
 		// UPDATE: product discount
 		if (productDiscountRequest != null) {
 			ProductDiscount productDiscount = product.getProductDiscount();
@@ -123,30 +150,12 @@ public class ProductServiceImpl implements ProductService {
 				if (productDiscount.getDiscount() != productDiscountRequest.getDiscount()) {
 					// Update last product discount entry
 					productDiscount.setEndDate(Instant.now());
-					createProductDiscount(product, productDiscountRequest);
+					newProductDiscount(product, productDiscountRequest);
 				} else {
 					productDiscount.setMessage(productDiscountRequest.getMessage());
 				}
 			} else
-				createProductDiscount(product, productDiscountRequest);
+				newProductDiscount(product, productDiscountRequest);
 		}
-
-		product = productRepository.save(product);
-
-		return ProductTransformer.convertEntityToResponse(product);
-	}
-
-	@Override
-	public DeleteResponse deleteProduct(Long productId) {
-
-		productRepository.findById(productId).orElseThrow(() -> new BadRequestException("Invalid product."));
-
-		return new DeleteResponse("Product deleted successfully.");
-	}
-
-	private void createProductDiscount(Product product, ProductDiscountRequest productDiscountRequest) {
-		// Create New product discount
-		product.addProductDiscount(new ProductDiscount(productDiscountRequest.getMessage(),
-				productDiscountRequest.getDiscount(), Instant.now()));
 	}
 }

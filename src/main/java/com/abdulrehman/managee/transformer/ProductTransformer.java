@@ -1,5 +1,8 @@
 package com.abdulrehman.managee.transformer;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+
 import com.abdulrehman.managee.model.Product;
 import com.abdulrehman.managee.model.ProductDiscount;
 import com.abdulrehman.managee.model.ProductPriceHistory;
@@ -14,6 +17,7 @@ public class ProductTransformer {
 	public static ProductResponse convertEntityToResponse(Product product) {
 		ProductResponse productResponse = new ProductResponse();
 
+		productResponse.setId(product.getId());
 		productResponse.setActive(product.isActive());
 		productResponse.setAvailable(product.isAvailable());
 		productResponse.setDescription(product.getDescription());
@@ -21,17 +25,24 @@ public class ProductTransformer {
 		productResponse.setGlobal(product.isGlobal());
 		productResponse.setName(product.getName());
 		productResponse.setUnit(product.getUnit());
-		productResponse.setId(product.getId());
 
 		ProductPriceHistory productPriceHistory = product.getProductPriceHistory();
-		if (productPriceHistory != null)
+		if (productPriceHistory != null) {
 			productResponse.setProductPriceHistoryResponse(
 					ProductPriceHistoryTransformer.convertEntityToResponse(productPriceHistory));
+			productResponse.setMrp(productPriceHistory.getAmount());
+			productResponse.setAmount(productPriceHistory.getAmount());
+			productResponse.setQuantity(productPriceHistory.getQuantity());
+		}
 
 		ProductDiscount productDiscount = product.getProductDiscount();
-		if (productDiscount != null)
+		if (productDiscount != null) {
 			productResponse
 					.setProductDiscountResponse(ProductDiscountTransformer.convertEntityToResponse(productDiscount));
+			BigDecimal result = productPriceHistory.getAmount().subtract(productPriceHistory.getAmount()
+					.multiply(new BigDecimal((double) productDiscount.getDiscount() / 100)));
+			productResponse.setAmount(result.round(MathContext.DECIMAL32));
+		}
 
 		return productResponse;
 	}

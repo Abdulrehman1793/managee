@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 public class ProductDiscountRequest {
 	private String message;
-	private int discount;
+	private double discount;
 	private Instant startDate;
 	private Instant endDate;
 }

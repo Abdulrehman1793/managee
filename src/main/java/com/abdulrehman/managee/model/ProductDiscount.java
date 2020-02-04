@@ -31,12 +31,12 @@ public class ProductDiscount extends UserDateAudit {
 	private String message;
 
 	// Percentage
-	private int discount;
+	private double discount;
 
 	private Instant startDate;
 	private Instant endDate;
 
-	public ProductDiscount(String message, int discount, Instant startDate) {
+	public ProductDiscount(String message, double discount, Instant startDate) {
 		super();
 		this.message = message;
 		this.discount = discount;

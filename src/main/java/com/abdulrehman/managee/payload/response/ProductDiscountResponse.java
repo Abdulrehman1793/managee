@@ -15,7 +15,7 @@ public class ProductDiscountResponse {
 	private Long id;
 
 	private String message;
-	private int discount;
+	private double discount;
 	private Instant startDate;
 	private Instant endDate;
 }

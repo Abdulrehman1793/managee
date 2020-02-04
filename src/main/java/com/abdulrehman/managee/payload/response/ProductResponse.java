@@ -1,6 +1,7 @@
 package com.abdulrehman.managee.payload.response;
 
-import java.util.List;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import com.abdulrehman.managee.model.ProductUnit;
 
@@ -26,8 +27,10 @@ public class ProductResponse {
 	private boolean active;
 	private boolean isAvailable;
 
+	private BigInteger quantity;
+	private BigDecimal mrp;
+	private BigDecimal amount;
+
 	private ProductPriceHistoryResponse productPriceHistoryResponse;
 	private ProductDiscountResponse productDiscountResponse;
-
-	private List<ProductResponse> childrens;
 }
