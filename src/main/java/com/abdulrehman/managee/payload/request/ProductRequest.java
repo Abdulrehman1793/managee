@@ -17,11 +17,9 @@ import lombok.Setter;
 public class ProductRequest {
 	@NotBlank(message = "{name.notblank}")
 	private String name;
-	@NotBlank(message = "{description.notblank}")
 	private String description;
 	private boolean isGlobal;
 	private ProductUnit unit;
-	private boolean isCategory;
 
 	@Min(value = 1, message = "{displayOrder.min}")
 	private int displayOrder;

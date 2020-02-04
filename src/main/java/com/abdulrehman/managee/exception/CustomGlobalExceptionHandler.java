@@ -1,7 +1,7 @@
 package com.abdulrehman.managee.exception;
 
 import java.io.IOException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.abdulrehman.managee.util.StringUtils;
-
 /**
  * @author Khan Abdulrehman
  * @CreatedAt Jan 31, 2020
@@ -35,7 +33,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 
 		Map<String, Object> body = new LinkedHashMap<>();
-		body.put("timestamp", new Date());
+		body.put("timestamp", Instant.now());
 		body.put("status", status.value());
 
 		// Get all errors
@@ -50,10 +48,10 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
 	private String validationMessage(FieldError fe) {
 
-		if (fe.getCode().equals("NotBlank")) {
-			if (fe.getDefaultMessage().isEmpty())
-				return StringUtils.toTitleCase(fe.getField()) + " is required.";
-		}
+//		if (fe.getCode().equals("NotBlank")) {
+//			if (fe.getDefaultMessage().isEmpty())
+//				return StringUtils.toTitleCase(fe.getField()) + " is required.";
+//		}
 
 		return fe.getDefaultMessage();
 	}

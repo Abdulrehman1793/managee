@@ -21,7 +21,6 @@ public class ProductResponse {
 	private ProductUnit unit;
 
 	private boolean isGlobal;
-	private boolean isCategory;
 
 	private int displayOrder;
 	private boolean active;

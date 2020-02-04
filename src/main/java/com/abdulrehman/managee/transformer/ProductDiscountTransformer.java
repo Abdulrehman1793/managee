@@ -14,10 +14,10 @@ public class ProductDiscountTransformer {
 		ProductDiscountResponse productDiscountResponse = new ProductDiscountResponse();
 
 		productDiscountResponse.setId(productDiscount.getId());
-		productDiscountResponse.setEndDate(productDiscount.getEndDate());
 		productDiscountResponse.setDiscount(productDiscount.getDiscount());
 		productDiscountResponse.setMessage(productDiscount.getMessage());
 		productDiscountResponse.setStartDate(productDiscount.getStartDate());
+		productDiscountResponse.setEndDate(productDiscount.getEndDate());
 
 		return productDiscountResponse;
 	}
@@ -26,9 +26,9 @@ public class ProductDiscountTransformer {
 			ProductDiscountRequest productDiscountRequest) {
 
 		productDiscount.setDiscount(productDiscountRequest.getDiscount());
-		productDiscount.setEndDate(productDiscountRequest.getEndDate());
 		productDiscount.setMessage(productDiscountRequest.getMessage());
 		productDiscount.setStartDate(productDiscountRequest.getStartDate());
+		productDiscount.setEndDate(productDiscountRequest.getEndDate());
 
 		return productDiscount;
 	}

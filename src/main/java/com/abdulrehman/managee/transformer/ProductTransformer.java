@@ -1,6 +1,8 @@
 package com.abdulrehman.managee.transformer;
 
 import com.abdulrehman.managee.model.Product;
+import com.abdulrehman.managee.model.ProductDiscount;
+import com.abdulrehman.managee.model.ProductPriceHistory;
 import com.abdulrehman.managee.payload.request.ProductRequest;
 import com.abdulrehman.managee.payload.response.ProductResponse;
 
@@ -14,7 +16,6 @@ public class ProductTransformer {
 
 		productResponse.setActive(product.isActive());
 		productResponse.setAvailable(product.isAvailable());
-		productResponse.setCategory(product.isCategory());
 		productResponse.setDescription(product.getDescription());
 		productResponse.setDisplayOrder(product.getDisplayOrder());
 		productResponse.setGlobal(product.isGlobal());
@@ -22,9 +23,15 @@ public class ProductTransformer {
 		productResponse.setUnit(product.getUnit());
 		productResponse.setId(product.getId());
 
-		if (product.getProductPriceHistory() != null)
+		ProductPriceHistory productPriceHistory = product.getProductPriceHistory();
+		if (productPriceHistory != null)
 			productResponse.setProductPriceHistoryResponse(
-					ProductPriceHistoryTransformer.convertEntityToResponse(product.getProductPriceHistory()));
+					ProductPriceHistoryTransformer.convertEntityToResponse(productPriceHistory));
+
+		ProductDiscount productDiscount = product.getProductDiscount();
+		if (productDiscount != null)
+			productResponse
+					.setProductDiscountResponse(ProductDiscountTransformer.convertEntityToResponse(productDiscount));
 
 		return productResponse;
 	}
@@ -33,10 +40,21 @@ public class ProductTransformer {
 
 		product.setActive(productRequest.isActive());
 		product.setAvailable(productRequest.isAvailable());
-		product.setCategory(productRequest.isCategory());
 		product.setDescription(productRequest.getDescription());
 		product.setDisplayOrder(productRequest.getDisplayOrder());
 		product.setGlobal(productRequest.isGlobal());
+		product.setName(productRequest.getName());
+		product.setUnit(productRequest.getUnit());
+
+		return product;
+	}
+
+	public static Product convertRequestToEntityUpdate(Product product, ProductRequest productRequest) {
+
+		product.setActive(productRequest.isActive());
+		product.setAvailable(productRequest.isAvailable());
+		product.setDescription(productRequest.getDescription());
+		product.setDisplayOrder(productRequest.getDisplayOrder());
 		product.setName(productRequest.getName());
 		product.setUnit(productRequest.getUnit());
 

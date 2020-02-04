@@ -20,7 +20,7 @@ public class ProductPriceHistoryRequest {
 	private BigInteger quantity;
 	private BigDecimal amount;
 
-	@JsonFormat(pattern = "dd-MMM-yyyy HH:mm:ss", timezone = "UTC")
+//	@JsonFormat(pattern = "dd-MMM-yyyy HH:mm:ss", timezone = "UTC")
 	private Instant startDate;
 	private Instant endDate;
 }

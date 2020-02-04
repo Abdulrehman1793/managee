@@ -50,12 +50,6 @@ public class Product extends UserDateAudit {
 
 	private ProductUnit unit;
 
-	/**
-	 * Creating category/menu: Product amount should be null. Only name, description
-	 * and isGlobal field will be accounted.
-	 */
-	private boolean isCategory;
-
 	private int displayOrder;
 	private boolean active;
 	private boolean isAvailable;
@@ -140,7 +134,7 @@ public class Product extends UserDateAudit {
 		return false;
 	}
 
-	public void addproductDiscount(ProductDiscount productDisount) {
+	public void addProductDiscount(ProductDiscount productDisount) {
 		if (productDisount != null) {
 			if (productDiscounts == null)
 				productDiscounts = new HashSet<>();
@@ -173,5 +167,27 @@ public class Product extends UserDateAudit {
 		}
 
 		return productPriceHistory;
+	}
+
+	public ProductDiscount getProductDiscount() {
+		ProductDiscount productDiscount = null;
+
+		if (productDiscounts == null)
+			return productDiscount;
+
+		Set<ProductDiscount> discounts = productDiscounts.stream().filter(row -> row.getEndDate() == null)
+				.collect(Collectors.toSet());
+
+		if (discounts.size() == 0)
+			return productDiscount;
+		else if (discounts.size() == 1)
+			return discounts.iterator().next();
+		else if (discounts.size() > 1) {
+			List<ProductDiscount> lists = productDiscounts.stream().collect(Collectors.toList());
+			Collections.sort(lists, Comparator.comparing(ProductDiscount::getStartDate));
+			productDiscount = lists.get(lists.size() - 1);
+		}
+
+		return productDiscount;
 	}
 }

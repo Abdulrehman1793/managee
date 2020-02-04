@@ -1,7 +1,5 @@
 package com.abdulrehman.managee.serviceimpl;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,16 +11,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.abdulrehman.managee.exception.BadRequestException;
 import com.abdulrehman.managee.model.Product;
 import com.abdulrehman.managee.model.ProductDiscount;
 import com.abdulrehman.managee.model.ProductPriceHistory;
+import com.abdulrehman.managee.payload.request.ProductDiscountRequest;
+import com.abdulrehman.managee.payload.request.ProductPriceHistoryRequest;
 import com.abdulrehman.managee.payload.request.ProductRequest;
+import com.abdulrehman.managee.payload.response.DeleteResponse;
 import com.abdulrehman.managee.payload.response.ProductResponse;
 import com.abdulrehman.managee.repository.ProductRepository;
 import com.abdulrehman.managee.service.ProductService;
 import com.abdulrehman.managee.transformer.ProductDiscountTransformer;
 import com.abdulrehman.managee.transformer.ProductPriceHistoryTransformer;
 import com.abdulrehman.managee.transformer.ProductTransformer;
+import com.abdulrehman.managee.util.AppConstants;
 
 /**
  * @author Khan Abdulrehman
@@ -59,23 +62,91 @@ public class ProductServiceImpl implements ProductService {
 		Product product = ProductTransformer.convertRequestToEntity(new Product(), productRequest);
 
 		// Adding product price history.
-		if (productRequest.getProductPriceHistoryRequest() != null)
+		ProductPriceHistoryRequest productPriceHistoryRequest = productRequest.getProductPriceHistoryRequest();
+		if (productPriceHistoryRequest != null)
 			product.addproductPriceHistory(ProductPriceHistoryTransformer
-					.convertRequestToEntity(new ProductPriceHistory(), productRequest.getProductPriceHistoryRequest()));
+					.convertRequestToEntity(new ProductPriceHistory(), productPriceHistoryRequest));
 		else {
 			// Add a product price history default value
-			product.addproductPriceHistory(
-					new ProductPriceHistory("Auto Generated", new BigInteger("1"), new BigDecimal("1"), Instant.now()));
+			product.addproductPriceHistory(new ProductPriceHistory(AppConstants.PPH_MESSAGE, AppConstants.PPH_QUANTITY,
+					AppConstants.PPH_AMOUNT, Instant.now()));
 		}
 
+		ProductDiscountRequest productDiscountRequest = productRequest.getProductDiscountRequest();
 		// Adding product discount.
-		if (productRequest.getProductDiscountRequest() != null)
-			product.addproductDiscount(ProductDiscountTransformer.convertRequestToEntity(new ProductDiscount(),
-					productRequest.getProductDiscountRequest()));
+		if (productDiscountRequest != null)
+			product.addProductDiscount(
+					ProductDiscountTransformer.convertRequestToEntity(new ProductDiscount(), productDiscountRequest));
 
 		product = productRepository.save(product);
 
 		return ProductTransformer.convertEntityToResponse(product);
 	}
 
+	@Override
+	public ProductResponse updateProduct(Long productId, ProductRequest productRequest) {
+
+		Product product = productRepository.findById(productId)
+				.orElseThrow(() -> new BadRequestException("Invalid product."));
+
+		product = ProductTransformer.convertRequestToEntityUpdate(product, productRequest);
+
+		ProductPriceHistoryRequest productPriceHistoryRequest = productRequest.getProductPriceHistoryRequest();
+		// UPDATE: product price history
+		if (productPriceHistoryRequest != null) {
+			// Get last PPH
+			ProductPriceHistory productPriceHistory = product.getProductPriceHistory();
+
+			/**
+			 * Update product price history - PPH. If product price amount/quantity changed
+			 * then update last PPH end date and create new entry of PPH with null end date.
+			 */
+			if (productPriceHistory.getAmount().compareTo(productPriceHistoryRequest.getAmount()) != 0
+					|| productPriceHistory.getQuantity().compareTo(productPriceHistoryRequest.getQuantity()) != 0) {
+				// Update last PPH entry
+				productPriceHistory.setEndDate(Instant.now());
+				// Create New PPH
+				product.addproductPriceHistory(new ProductPriceHistory(productPriceHistoryRequest.getMessage(),
+						productPriceHistoryRequest.getQuantity(), productPriceHistoryRequest.getAmount(),
+						Instant.now()));
+			} else {
+				productPriceHistory.setMessage(productPriceHistoryRequest.getMessage());
+			}
+		}
+		ProductDiscountRequest productDiscountRequest = productRequest.getProductDiscountRequest();
+		// UPDATE: product discount
+		if (productDiscountRequest != null) {
+			ProductDiscount productDiscount = product.getProductDiscount();
+
+			// Product discount could be null.
+			if (productDiscount != null) {
+				if (productDiscount.getDiscount() != productDiscountRequest.getDiscount()) {
+					// Update last product discount entry
+					productDiscount.setEndDate(Instant.now());
+					createProductDiscount(product, productDiscountRequest);
+				} else {
+					productDiscount.setMessage(productDiscountRequest.getMessage());
+				}
+			} else
+				createProductDiscount(product, productDiscountRequest);
+		}
+
+		product = productRepository.save(product);
+
+		return ProductTransformer.convertEntityToResponse(product);
+	}
+
+	@Override
+	public DeleteResponse deleteProduct(Long productId) {
+
+		productRepository.findById(productId).orElseThrow(() -> new BadRequestException("Invalid product."));
+
+		return new DeleteResponse("Product deleted successfully.");
+	}
+
+	private void createProductDiscount(Product product, ProductDiscountRequest productDiscountRequest) {
+		// Create New product discount
+		product.addProductDiscount(new ProductDiscount(productDiscountRequest.getMessage(),
+				productDiscountRequest.getDiscount(), Instant.now()));
+	}
 }

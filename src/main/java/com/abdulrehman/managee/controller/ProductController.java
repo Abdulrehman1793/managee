@@ -3,6 +3,7 @@ package com.abdulrehman.managee.controller;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,4 +29,9 @@ public class ProductController {
 		return productService.createProduct(productRequest);
 	}
 
+	@PostMapping("/update/{id}")
+	public ProductResponse updateProduct(@PathVariable(name = "id") Long productId,
+			@Valid @RequestBody ProductRequest productRequest) {
+		return productService.updateProduct(productId, productRequest);
+	}
 }
