@@ -4,11 +4,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public interface AppConstants {
+	String DELETE_MESSAGE = "Record deleted succesfully.";
+
 	String DATE_FORMAT = "dd-MM-yyyy";
 	String DATETIME_FORMAT = "dd-MM-yyyy HH:mm:ss";
 
-	String DEFAULT_PAGE_NUMBER = "0";
-	String DEFAULT_PAGE_SIZE = "30";
+	Integer DEFAULT_PAGE_NUMBER = 0;
+	Integer DEFAULT_PAGE_SIZE = 30;
 
 	int MAX_PAGE_SIZE = 50;
 

@@ -1,5 +1,6 @@
 package com.abdulrehman.managee.serviceimpl;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -7,18 +8,24 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.abdulrehman.managee.exception.AppException;
 import com.abdulrehman.managee.exception.BadRequestException;
 import com.abdulrehman.managee.model.Address;
 import com.abdulrehman.managee.model.Company;
+import com.abdulrehman.managee.model.RoleName;
+import com.abdulrehman.managee.model.User;
 import com.abdulrehman.managee.payload.request.AddressRequest;
 import com.abdulrehman.managee.payload.request.CompanyRequest;
 import com.abdulrehman.managee.payload.response.CompanyResponse;
 import com.abdulrehman.managee.payload.response.DeleteResponse;
 import com.abdulrehman.managee.repository.CompanyRepository;
+import com.abdulrehman.managee.security.UserPrincipal;
 import com.abdulrehman.managee.service.AddressService;
+import com.abdulrehman.managee.service.AuthService;
 import com.abdulrehman.managee.service.CompanyService;
 import com.abdulrehman.managee.transformer.AddressTransformer;
 import com.abdulrehman.managee.transformer.CompanyTransformer;
+import com.abdulrehman.managee.util.AppUtils;
 
 /**
  * @author Khan Abdulrehman
@@ -33,6 +40,9 @@ public class CompanyServiceImpl implements CompanyService {
 
 	@Autowired
 	private AddressService addressService;
+
+	@Autowired
+	private AuthService authService;
 
 	@Override
 	public CompanyResponse findByDisplayName(String displayName) {
@@ -71,6 +81,19 @@ public class CompanyServiceImpl implements CompanyService {
 		Set<Address> addresses = AddressTransformer.addressesFromCompanyRequest(companyRequest.getAddressRequests());
 		if (addresses != null)
 			company.setAddresses(addresses);
+
+		User user = authService.getCurrentUser();
+
+		// Company should have one owner.
+		List<Company> companies = companyRepository.findAllCompanyByUserId(user.getId());
+		if (companies.size() > 0)
+			throw new AppException("The user have already registered for other company.");
+
+		// Adding user.
+		company.addUser(user);
+
+		// Update role of current user to ROLE_OWNER
+		authService.updateCurrentUserRole(RoleName.ROLE_OWNER);
 
 		company = companyRepository.save(company);
 

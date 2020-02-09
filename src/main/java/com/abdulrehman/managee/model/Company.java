@@ -48,6 +48,16 @@ public class Company extends UserDateAudit {
 	@OneToMany(cascade = CascadeType.ALL)
 	private Set<Address> addresses;
 
+	@OneToMany(mappedBy = "company")
+	private Set<Category> categories;
+
+	@OneToMany(mappedBy = "company")
+	private Set<Product> products;
+
+	@JoinTable(name = "company_user_lnk", joinColumns = @JoinColumn(name = "comp_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
+	@OneToMany(cascade = CascadeType.ALL)
+	private Set<User> users;
+
 	public void addAddress(Address address) {
 		if (address != null) {
 			if (this.addresses == null)
@@ -64,5 +74,13 @@ public class Company extends UserDateAudit {
 	public void removeAddressById(Long id) {
 		if (this.addresses != null && id > 0)
 			this.addresses.removeIf(row -> row.getId() == id);
+	}
+
+	public void addUser(User user) {
+		if (user != null) {
+			if (this.users == null)
+				this.users = new HashSet<User>();
+			this.users.add(user);
+		}
 	}
 }

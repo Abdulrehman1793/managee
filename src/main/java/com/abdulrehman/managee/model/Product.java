@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -48,6 +50,7 @@ public class Product extends UserDateAudit {
 	// Globally available for all users
 	private boolean isGlobal;
 
+	@Enumerated(EnumType.STRING)
 	private ProductUnit unit;
 
 	private int displayOrder;
@@ -61,8 +64,8 @@ public class Product extends UserDateAudit {
 	private Set<ProductDiscount> productDiscounts;
 
 	@ManyToOne
-	@JoinColumn(name = "product_id")
-	private Product product;
+	@JoinColumn(name = "company_id")
+	private Company company;
 
 	public Product() {
 	}

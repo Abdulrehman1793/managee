@@ -9,5 +9,6 @@ public interface AppUrls {
 
 	String COMPANY = root + "company";
 	String PRODUCT = root + "product";
+	String CATEGORY = root + "category";
 
 }
